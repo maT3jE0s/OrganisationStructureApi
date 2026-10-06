@@ -1,0 +1,40 @@
+### Create employee
+# @name CreateEmployee
+## TEST-EXPECT-STATUS: [201]
+## TEST-HAS-BODY
+POST http://localhost:5080/api/employees/
+Content-Type: application/json
+
+{
+    "degree": "Ing.",
+    "name": "Jan",
+    "surname": "Novak",
+    "phone": "+421900111222",
+    "email": "jan.novak@example.com"
+}
+
+### Create second employee
+# @name CreateSecondEmployee
+## TEST-EXPECT-STATUS: [201]
+POST http://localhost:5080/api/employees/
+Content-Type: application/json
+
+{
+    "degree": "Mgr.",
+    "name": "Eva",
+    "surname": "Kovacova",
+    "phone": "0900 333 444",
+    "email": "eva.kovacova@example.com"
+}
+
+### Read the created employee back
+# @name GetEmployee
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/employees/{{CreateEmployee.response.body.$.id}}
+Accept: application/json
+
+### List employees
+# @name ListEmployees
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/employees/
+Accept: application/json

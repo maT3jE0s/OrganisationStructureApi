@@ -1,0 +1,29 @@
+### Delete the company (children are removed too)
+# @name DeleteCompany
+## TEST-EXPECT-STATUS: [204]
+DELETE http://localhost:5080/api/companies/{{CompanyId}}
+
+### Company is gone
+# @name GetDeletedCompany
+## TEST-EXPECT-STATUS: [404]
+GET http://localhost:5080/api/companies/{{CompanyId}}
+
+### Division is gone
+# @name GetDeletedDivision
+## TEST-EXPECT-STATUS: [404]
+GET http://localhost:5080/api/divisions/{{DivisionId}}
+
+### Project is gone
+# @name GetDeletedProject
+## TEST-EXPECT-STATUS: [404]
+GET http://localhost:5080/api/projects/{{ProjectId}}
+
+### Department is gone
+# @name GetDeletedDepartment
+## TEST-EXPECT-STATUS: [404]
+GET http://localhost:5080/api/departments/{{DepartmentId}}
+
+### Deleting again returns 404
+# @name DeleteCompanyAgain
+## TEST-EXPECT-STATUS: [404]
+DELETE http://localhost:5080/api/companies/{{CompanyId}}

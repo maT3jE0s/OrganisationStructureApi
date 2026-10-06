@@ -1,0 +1,44 @@
+### Update division (rename, change code and leader)
+# @name UpdateDivision
+## TEST-EXPECT-STATUS: [200]
+PUT http://localhost:5080/api/divisions/{{DivisionId}}
+Content-Type: application/json
+
+{
+    "name": "Software Engineering Division",
+    "code": "100-11",
+    "parentId": {{CompanyId}},
+    "leaderId": {{SecondEmployeeId}}
+}
+
+### Read updated division
+# @name GetUpdatedDivision
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/divisions/{{DivisionId}}
+Accept: application/json
+
+### Update with a non-existing leader
+# @name UpdateUnknownLeader
+## TEST-EXPECT-STATUS: [400]
+PUT http://localhost:5080/api/divisions/{{DivisionId}}
+Content-Type: application/json
+
+{
+    "name": "Software Engineering Division",
+    "code": "100-11",
+    "parentId": {{CompanyId}},
+    "leaderId": 999999
+}
+
+### Update non-existing node
+# @name UpdateUnknownNode
+## TEST-EXPECT-STATUS: [404]
+PUT http://localhost:5080/api/divisions/999999
+Content-Type: application/json
+
+{
+    "name": "Ghost Division",
+    "code": "1",
+    "parentId": {{CompanyId}},
+    "leaderId": {{EmployeeId}}
+}

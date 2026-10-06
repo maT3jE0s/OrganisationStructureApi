@@ -1,0 +1,28 @@
+CREATE DATABASE OrgStructureDb;
+GO
+
+USE OrgStructureDb;
+GO
+
+CREATE TABLE Employees (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Degree NVARCHAR(10) NOT NULL,
+    Name NVARCHAR(50) NOT NULL,
+    Surname NVARCHAR(50) NOT NULL,
+    Phone NVARCHAR(15) NOT NULL,
+    Email NVARCHAR(50) NOT NULL
+);
+GO
+
+CREATE TABLE OrgNodes (
+    Id int IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(50) NOT NULL,
+    Code NVARCHAR(50) NOT NULL,
+    Type INT NOT NULL,
+    ParentId INT NULL,
+    LeaderId INT NOT NULL,
+
+    CONSTRAINT FK_Parent FOREIGN KEY (ParentId) REFERENCES OrgNodes(Id),
+    CONSTRAINT FK_Leader FOREIGN KEY (LeaderId) REFERENCES Employees(Id)
+);
+GO

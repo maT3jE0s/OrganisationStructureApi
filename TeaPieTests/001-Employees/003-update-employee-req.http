@@ -1,0 +1,19 @@
+### Update second employee
+# @name UpdateSecond
+## TEST-EXPECT-STATUS: [200]
+PUT http://localhost:5080/api/employees/{{SecondEmployeeId}}
+Content-Type: application/json
+
+{
+    "degree": "PhD.",
+    "name": "Eva",
+    "surname": "Horvathova",
+    "phone": "+421911555666",
+    "email": "eva.horvathova@example.com"
+}
+
+### Read updated employee
+# @name GetUpdated
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/employees/{{SecondEmployeeId}}
+Accept: application/json

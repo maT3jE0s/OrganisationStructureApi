@@ -1,0 +1,68 @@
+### Create company
+# @name CreateCompany
+## TEST-EXPECT-STATUS: [201]
+POST http://localhost:5080/api/companies/
+Content-Type: application/json
+
+{
+    "name": "Acme Corporation",
+    "code": "100",
+    "leaderId": {{EmployeeId}}
+}
+
+### Create division under the company
+# @name CreateDivision
+## TEST-EXPECT-STATUS: [201]
+POST http://localhost:5080/api/divisions/
+Content-Type: application/json
+
+{
+    "name": "Software Division",
+    "code": "100-10",
+    "parentId": {{CreateCompany.response.body.$.id}},
+    "leaderId": {{EmployeeId}}
+}
+
+### Create project under the division
+# @name CreateProject
+## TEST-EXPECT-STATUS: [201]
+POST http://localhost:5080/api/projects/
+Content-Type: application/json
+
+{
+    "name": "Alpha Project",
+    "code": "100-10-1",
+    "parentId": {{CreateDivision.response.body.$.id}},
+    "leaderId": {{EmployeeId}}
+}
+
+### Create department under the project
+# @name CreateDepartment
+## TEST-EXPECT-STATUS: [201]
+POST http://localhost:5080/api/departments/
+Content-Type: application/json
+
+{
+    "name": "Backend Department",
+    "code": "100-10-1-1",
+    "parentId": {{CreateProject.response.body.$.id}},
+    "leaderId": {{EmployeeId}}
+}
+
+### Read each node back
+# @name GetCompany
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/companies/{{CreateCompany.response.body.$.id}}
+Accept: application/json
+
+###
+# @name GetDepartment
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/departments/{{CreateDepartment.response.body.$.id}}
+Accept: application/json
+
+### List divisions
+# @name ListDivisions
+## TEST-EXPECT-STATUS: [200]
+GET http://localhost:5080/api/divisions/
+Accept: application/json

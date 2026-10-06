@@ -1,0 +1,19 @@
+### Delete first employee (no longer a leader)
+# @name DeleteLeader
+## TEST-EXPECT-STATUS: [204]
+DELETE http://localhost:5080/api/employees/{{EmployeeId}}
+
+### Delete second employee
+# @name DeleteSecond
+## TEST-EXPECT-STATUS: [204]
+DELETE http://localhost:5080/api/employees/{{SecondEmployeeId}}
+
+### Employee is gone
+# @name GetDeletedEmployee
+## TEST-EXPECT-STATUS: [404]
+GET http://localhost:5080/api/employees/{{EmployeeId}}
+
+### Deleting again returns 404
+# @name DeleteEmployeeAgain
+## TEST-EXPECT-STATUS: [404]
+DELETE http://localhost:5080/api/employees/{{EmployeeId}}
