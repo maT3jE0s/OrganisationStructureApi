@@ -10,6 +10,7 @@ namespace OrganisationStructureApi.Models
         public String Surname { get; set; } = String.Empty;
         public String Phone { get; set; } = String.Empty;
         public String Email { get; set; } = String.Empty;
+        public int? CompanyId { get; set; }
 
         public static Employee fromDto(EmployeeRequest employeeRequest)
         {
@@ -19,7 +20,8 @@ namespace OrganisationStructureApi.Models
                 Name = employeeRequest.Name,
                 Surname = employeeRequest.Surname,
                 Phone = employeeRequest.Phone,
-                Email = employeeRequest.Email
+                Email = employeeRequest.Email,
+                CompanyId = employeeRequest.CompanyId
             };
         }
 
@@ -32,7 +34,8 @@ namespace OrganisationStructureApi.Models
                 Name = this.Name,
                 Surname = this.Surname,
                 Phone = this.Phone,
-                Email = this.Email
+                Email = this.Email,
+                CompanyId = this.CompanyId
             };
         }
     }

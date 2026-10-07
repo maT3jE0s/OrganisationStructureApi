@@ -7,7 +7,6 @@ namespace OrganisationStructureApi.Dtos
     {
         [Required(ErrorMessage = "Name is required")]
         [StringLength(50, ErrorMessage = "Name must be at most 50 characters long")]
-        [RegularExpression(@"^[\p{L}\s\-']+$", ErrorMessage = "Name must contain only letters, spaces, hyphens, and apostrophes")]
         public string Name { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Code is required")]

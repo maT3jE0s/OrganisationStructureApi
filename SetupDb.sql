@@ -10,7 +10,8 @@ CREATE TABLE Employees (
     Name NVARCHAR(50) NOT NULL,
     Surname NVARCHAR(50) NOT NULL,
     Phone NVARCHAR(15) NOT NULL,
-    Email NVARCHAR(50) NOT NULL
+    Email NVARCHAR(50) NOT NULL,
+    CompanyId INT NULL
 );
 GO
 

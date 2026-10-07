@@ -8,5 +8,6 @@
         public String Surname { get; set; } = String.Empty;
         public String Phone { get; set; } = String.Empty;
         public String Email { get; set; } = String.Empty;
+        public int? CompanyId { get; set; }
     }
 }

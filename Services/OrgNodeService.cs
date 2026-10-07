@@ -10,12 +10,19 @@ namespace OrganisationStructureApi.Services
     {
         public async Task<OrgNodeResponse> AddOrgNodeAsync(OrgNodeType type, OrgNodeRequest orgNode)
         {
-            await ValidateAsync(type, orgNode);
+            var leader = await ValidateAsync(type, orgNode, null);
 
             var newOrgNode = OrgNode.fromDto(orgNode);
             newOrgNode.Type = type;
             db.OrgNodes.Add(newOrgNode);
             await db.SaveChangesAsync();
+
+            if (type == OrgNodeType.Company)
+            {
+                leader.CompanyId = newOrgNode.Id;
+                await db.SaveChangesAsync();
+            }
+
             return newOrgNode.toDto();
         }
 
@@ -36,8 +43,8 @@ namespace OrganisationStructureApi.Services
 
         public async Task<List<OrgNodeResponse>> GetAllOrgNodesAsync(OrgNodeType type)
         {
-            var orgNodes = await db.OrgNodes.ToListAsync();
-            return orgNodes.Where(n => n.Type == type).Select(n => n.toDto()).ToList();
+            var orgNodes = await db.OrgNodes.Where(n => n.Type == type).ToListAsync();
+            return orgNodes.Select(n => n.toDto()).ToList();
         }
 
         public async Task<OrgNodeResponse> GetOrgNodeByIdAsync(OrgNodeType type, int id)
@@ -50,12 +57,20 @@ namespace OrganisationStructureApi.Services
         {
             var updateOrgNode = await FindByIdAsync(type, id);
 
-            await ValidateAsync(type, orgNode);
+            var leader = await ValidateAsync(type, orgNode, updateOrgNode);
+
+            if (updateOrgNode.ParentId != orgNode.ParentId
+                && await GetCompanyIdAsync(updateOrgNode) != await GetCompanyIdAsync(OrgNode.fromDto(orgNode)))
+            {
+                throw new InvalidOperationException("Node cannot be moved to a different company.");
+            }
 
             updateOrgNode.Name = orgNode.Name;
             updateOrgNode.Code = orgNode.Code;
             updateOrgNode.ParentId = orgNode.ParentId;
             updateOrgNode.LeaderId = orgNode.LeaderId;
+
+            if (type == OrgNodeType.Company) leader.CompanyId = updateOrgNode.Id;
 
             await db.SaveChangesAsync();
             return updateOrgNode.toDto();
@@ -67,14 +82,26 @@ namespace OrganisationStructureApi.Services
                 ?? throw new ResourceNotFoundException($"{type} with ID {id} not found");
         }
 
-        private async Task ValidateAsync(OrgNodeType type, OrgNodeRequest orgNode)
+        private async Task<int> GetCompanyIdAsync(OrgNode node)
         {
+            while (node.Type != OrgNodeType.Company)
+            {
+                node = await db.OrgNodes.FirstAsync(n => n.Id == node.ParentId.Value);
+            }
+            return node.Id;
+        }
+
+        private async Task<Employee> ValidateAsync(OrgNodeType type, OrgNodeRequest orgNode, OrgNode? existing)
+        {
+            int? companyId;
+
             if (type == OrgNodeType.Company)
             {
                 if (orgNode.ParentId.HasValue)
                 {
                     throw new InvalidOperationException("Company cannot have a parent");
                 }
+                companyId = existing?.Id;
             }
             else
             {
@@ -83,11 +110,10 @@ namespace OrganisationStructureApi.Services
                     throw new InvalidOperationException($"{type} must have a parent");
                 }
 
-                var parentIsValid = await db.OrgNodes.AnyAsync(n => n.Id == orgNode.ParentId.Value && n.Type == type - 1);
-                if (!parentIsValid)
-                {
-                    throw new InvalidOperationException($"Parent with ID {orgNode.ParentId.Value} and type {type - 1} not found");
-                }
+                var parent = await db.OrgNodes.FirstOrDefaultAsync(n => n.Id == orgNode.ParentId.Value && n.Type == type - 1)
+                    ?? throw new InvalidOperationException($"Parent with ID {orgNode.ParentId.Value} and type {type - 1} not found");
+
+                companyId = await GetCompanyIdAsync(parent);
             }
 
             var leader = await db.Employees.FirstOrDefaultAsync(e => e.Id == orgNode.LeaderId);
@@ -95,6 +121,18 @@ namespace OrganisationStructureApi.Services
             {
                 throw new InvalidOperationException($"Leader with ID {orgNode.LeaderId} not found");
             }
+
+            if (type == OrgNodeType.Company)
+            {
+                if (leader.CompanyId is not null && leader.CompanyId != companyId)
+                    throw new InvalidOperationException("Leader already belongs to a different company.");
+            }
+            else if (leader.CompanyId != companyId)
+            {
+                throw new InvalidOperationException("Leader must be an employee of the same company.");
+            }
+
+            return leader;
         }
     }
 }

@@ -1,4 +1,4 @@
-### Update division (rename, change code and leader)
+### Update division (rename, change code)
 # @name UpdateDivision
 ## TEST-EXPECT-STATUS: [200]
 PUT http://localhost:5080/api/divisions/{{DivisionId}}
@@ -8,7 +8,7 @@ Content-Type: application/json
     "name": "Software Engineering Division",
     "code": "100-11",
     "parentId": {{CompanyId}},
-    "leaderId": {{SecondEmployeeId}}
+    "leaderId": {{EmployeeId}}
 }
 
 ### Read updated division

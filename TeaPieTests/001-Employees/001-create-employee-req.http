@@ -10,7 +10,8 @@ Content-Type: application/json
     "name": "Jan",
     "surname": "Novak",
     "phone": "+421900111222",
-    "email": "jan.novak@example.com"
+    "email": "jan.novak@example.com",
+    "companyId": null
 }
 
 ### Create second employee
@@ -24,7 +25,8 @@ Content-Type: application/json
     "name": "Eva",
     "surname": "Kovacova",
     "phone": "0900 333 444",
-    "email": "eva.kovacova@example.com"
+    "email": "eva.kovacova@example.com",
+    "companyId": null
 }
 
 ### Read the created employee back

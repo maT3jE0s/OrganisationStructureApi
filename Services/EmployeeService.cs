@@ -13,6 +13,7 @@ namespace OrganisationStructureApi.Services
     {
         public async Task<EmployeeResponse> AddEmployeeAsync(EmployeeRequest employee)
         {
+            await ValidateCompanyExistanceAsync(employee.CompanyId);
             var newEmployee = Employee.fromDto(employee);
             db.Employees.Add(newEmployee);
             await db.SaveChangesAsync();
@@ -47,12 +48,20 @@ namespace OrganisationStructureApi.Services
         public async Task<EmployeeResponse> UpdateEmployeeAsync(int id, EmployeeRequest employee)
         {
             var updateEmployee = await FindByIdAsync(id);
+            await ValidateCompanyExistanceAsync(employee.CompanyId);
+
+            if (updateEmployee.CompanyId != employee.CompanyId
+                && await db.OrgNodes.AnyAsync(o => o.LeaderId == id))
+            {
+                throw new InvalidOperationException("Employee leads an organization node, company cannot be changed.");
+            }
 
             updateEmployee.Degree = employee.Degree;
             updateEmployee.Name = employee.Name;
             updateEmployee.Surname = employee.Surname;
             updateEmployee.Phone = employee.Phone;
             updateEmployee.Email = employee.Email;
+            updateEmployee.CompanyId = employee.CompanyId;
 
             await db.SaveChangesAsync();
             return updateEmployee.toDto();
@@ -62,6 +71,14 @@ namespace OrganisationStructureApi.Services
         {
             return await db.Employees.FirstOrDefaultAsync(e => e.Id == id)
                 ?? throw new ResourceNotFoundException($"Employee with ID {id} not found");
+        }
+
+        private async Task ValidateCompanyExistanceAsync(int? companyId)
+        {
+            if (companyId.HasValue && !await db.OrgNodes.AnyAsync(n => n.Id == companyId.Value && n.Type == OrgNodeType.Company))
+            {
+                throw new InvalidOperationException($"Company with ID {companyId.Value} does not exist.");
+            }
         }
     }
 }

@@ -28,5 +28,8 @@ namespace OrganisationStructureApi.Dtos
         [StringLength(50, ErrorMessage = "Email must be at most 50 characters long")]
         [EmailAddress(ErrorMessage = "Email must be a valid email address")]
         public String Email { get; set; } = String.Empty;
+
+        [Range(1, int.MaxValue, ErrorMessage = "CompanyId must be a positive integer")]
+        public int? CompanyId { get; set; }
     }
 }
