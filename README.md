@@ -15,8 +15,9 @@ REST API for managing employees and a 4-level hierarchical organizational struct
 
 ### 2. Run the API
 1. Update the connection string in `appsettings.json` to point to your SQL Server instance.
-2. In OrganisationStructureApi directory, run the following command to start the API:
+2. Run the following command to start the API:
    ```bash
+   cd OrganisationStructureApi
    dotnet run
    ```
 
